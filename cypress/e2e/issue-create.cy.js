@@ -8,7 +8,7 @@ describe('Issue create', () => {
       });
   });
 
-  it.only('Should create an issue and validate it successfully', () => {
+  it('Should create a new issue and validate it successfully', () => {
     cy.get('[data-testid="modal:issue-create"]', { timeout: 30000 }).should('be.visible');
     cy.get('[data-testid="modal:issue-create"]').within(() => {
       cy.get('.ql-editor').type('My bug description');
@@ -16,8 +16,12 @@ describe('Issue create', () => {
       cy.get('input[name="title"]').type('BUG');
       cy.get('input[name="title"]').should('have.value', 'BUG');
       cy.get('[data-testid="select:type"]').click();
-      cy.get('[data-testid="select-option:Bug"]').wait(1000).trigger('mouseover').trigger('click');
-      cy.get('[data-testid="icon:Bug"]').should('be.visible')
+      cy.get('[data-testid="select-option:Bug"]').wait(5000).trigger('mouseover').trigger('click');
+      cy.get('[data-testid="icon:bug"]').should('be.visible');
+      cy.get('[data-testid="select:reporterId"]').click();
+      cy.get('[data-testid="select-option:Pickle Rick"]').click();
+      cy.get('[data-testid="form-field:userIds"]').click();
+      cy.get('[data-testid="select-option:Lord Gaben"]').click();
 
 
 
