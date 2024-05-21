@@ -4,9 +4,24 @@ describe('Issue create', () => {
     cy.url()
       .should('eq', `${Cypress.env('baseUrl')}project/board`)
       .then((url) => {
-        // System will already open issue creating modal in beforeEach block
         cy.visit(url + '/board?modal-issue-create=true');
       });
+  });
+
+  it.only('Should create an issue and validate it successfully', () => {
+    cy.get('[data-testid="modal:issue-create"]', { timeout: 30000 }).should('be.visible');
+    cy.get('[data-testid="modal:issue-create"]').within(() => {
+      cy.get('.ql-editor').type('My bug description');
+      cy.get('.ql-editor').should('have.text', 'My bug description');
+      cy.get('input[name="title"]').type('BUG');
+      cy.get('input[name="title"]').should('have.value', 'BUG');
+      cy.get('[data-testid="select:type"]').click();
+      cy.get('[data-testid="select-option:Bug"]').wait(1000).trigger('mouseover').trigger('click');
+      cy.get('[data-testid="icon:Bug"]').should('be.visible')
+
+
+
+    });
   });
 
   it('Should create an issue and validate it successfully', () => {
@@ -30,15 +45,15 @@ describe('Issue create', () => {
       // Select Baby Yoda from reporter dropdown
       cy.get('[data-testid="select:reporterId"]').click();
       cy.get('[data-testid="select-option:Baby Yoda"]').click();
-
+      
       // Select Baby Yoda from assignee dropdown
       cy.get('[data-testid="form-field:userIds"]').click();
       cy.get('[data-testid="select-option:Pickle Rick"]').click();
 
       // Click on button "Create issue"
       cy.get('button[type="submit"]').click();
-    });
-
+   
+})
     // Assert that modal window is closed and successful message is visible
     cy.get('[data-testid="modal:issue-create"]').should('not.exist');
     cy.contains('Issue has been successfully created.').should('be.visible');
