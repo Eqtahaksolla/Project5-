@@ -37,7 +37,8 @@ describe('Issue comments creating, editing and deleting', () => {
                 .contains('Edit')
                 .click()
                 .should('not.exist');
-
+                git remote add personal_repo https://github.com/Eqtahaksolla/Project5-
+                https://github.com/Eqtahaksolla/Project5-
             cy.get('textarea[placeholder="Add a comment..."]')
                 .should('contain', previousComment)
                 .clear()
@@ -69,3 +70,4 @@ describe('Issue comments creating, editing and deleting', () => {
             .should('not.exist');
     });
 });
+##my comment
