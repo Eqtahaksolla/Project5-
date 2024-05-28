@@ -6,8 +6,16 @@ const IssueTitle = "This is an issue of type: Task.";
 function confirmDeletion() {
   cy.get(confirmationPopup).should('be.visible').within(() => {
     cy.contains('Delete').should('be.visible').click();
-    cy.get (confirmationPopup).should('not.exist');
   });
+  cy.get(confirmationPopup).should('not.exist');
+}
+
+function cancelDeletion() {
+  cy.get(confirmationPopup).within(() => {
+    cy.contains('Cancel').click();
+  });
+  cy.get(confirmationPopup).should('not.exist');
+  cy.contains(IssueTitle).should('be.visible');
 }
 
 describe("Issue deletion", () => {
@@ -19,12 +27,18 @@ describe("Issue deletion", () => {
       cy.get('[data-testid="modal:issue-details"]').should("be.visible");
     });
   });
-//1st part Issue deletion
+
+  // Issue deletion
   it('should delete issue and validate', () => {
     cy.get(TrashButton).click();
     confirmDeletion();
     cy.contains(IssueTitle).should("not.exist");
-    
- //2nd part stop issue deletion using POM  
+  });
+
+  // Cancelling issue deletion
+  it('should cancel issue deletion', () => {
+    cy.get(TrashButton).click();
+    cy.get(confirmationPopup).should('be.visible');
+    cancelDeletion();
   });
 });
