@@ -1,0 +1,40 @@
+class issueModal {
+  constructor() {
+    this.submitButton = 'button[type="submit"]';
+    this.issueModal = '[data-testid="modal:issue-create"]';
+    this.issueDetailModal = '[data-testid="modal:issue-details"]';
+    this.title = 'input[name="title"]';
+    this.issueType = '[data-testid="select:type"]';
+    this.descriptionField = ".ql-editor";
+    this.assignee = '[data-testid="select:userIds"]';
+    this.backlogList = '[data-testid="board-list:backlog"]';
+    this.issuesList = '[data-testid="list-issue"]';
+    this.deleteButton = '[data-testid="icon:trash"]';
+    this.deleteButtonName = "Delete issue";
+    this.cancelDeletionButtonName = "Cancel";
+    this.confirmationPopup = '[data-testid="modal:confirm"]';
+    this.closeDetailModalButton = '[data-testid="icon:close"]';
+
+    }
+createNewIssue(issueDetails)
+  this.issueModal ({ timeout: 60000 }).should('be.visible');
+    this.issueModal.within(() => {
+      this.descriptionField.type(randomDescription);
+      this.descriptionField.should('have.text', randomDescription);
+      this.title.type(randomTitle);
+      this.title.should('have.value', randomTitle);
+      cy.get('[data-testid="select:priority"]').click();
+      cy.get('[data-testid="select-option:Highest"]').click();
+      cy.get('[data-testid="select:type"]').click();
+      cy.get('[data-testid="select-option:Bug"]').wait(5000).trigger('mouseover').trigger('click');
+      cy.get('[data-testid="icon:bug"]').should('be.visible');
+      cy.get('[data-testid="select:reporterId"]').click();
+      cy.get('[data-testid="select-option:Pickle Rick"]').click();
+      cy.get('[data-testid="form-field:userIds"]').click();
+      cy.get('[data-testid="select-option:Lord Gaben"]').click();
+      cy.get('button[type="submit"]').click();
+      cy.log('Clicked submit button');
+
+    })
+}
+export default new issueModal();
