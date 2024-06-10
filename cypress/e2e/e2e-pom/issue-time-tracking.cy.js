@@ -14,6 +14,7 @@ const inputNumber = 'input[placeholder="Number"]';
 const EXPECTED_AMOUNT_OF_ISSUES = 5;
 const timetrackingWindow = '[data-testid="modal:tracking"]';
 const WatchIcon = '[data-testid="icon:stopwatch"]';
+
 beforeEach(() => {
   cy.visit("/");
   cy.url()
@@ -41,8 +42,10 @@ function createNewIssue() {
   );
   cy.get('[data-testid="modal:issue-create"]').within(() => {
     cy.get(".ql-editor").type(randomDescription);
+    cy.wait(2000);
     cy.get(".ql-editor").should("have.text", randomDescription);
     cy.get('input[name="title"]').type(randomTitle);
+    cy.wait(1000);
     cy.get('input[name="title"]').should("have.value", randomTitle);
     cy.get('[data-testid="select:priority"]').click();
     cy.get('[data-testid="select-option:Highest"]').click();
@@ -75,6 +78,7 @@ function setOriginalEstimate(value) {
       }
     });
 }
+
 function setTimeValue(value) {
   const inputSelector = 'input[placeholder="Number"]';
   cy.get(inputSelector)
@@ -99,7 +103,6 @@ describe("Issue time tracking", () => {
   it("should create issue, add time estimation, edit and delete it", () => {
     createNewIssue();
     IssueModal.ensureIssueIsCreated(EXPECTED_AMOUNT_OF_ISSUES, issueDetails);
-
     openIssueDetails();
 
     // Add time estimation
@@ -132,11 +135,11 @@ describe("Issue time tracking", () => {
     closeTimeEstimation();
     cy.wait(3000);
     openIssueDetails();
-
+    // Check that it worked
     cy.get(inputNumber).should("have.value", "");
   });
 
-  it.only("should create issue, log time, update and delete it", () => {
+  it("should create issue, log time, update and delete it", () => {
     createNewIssue();
     IssueModal.ensureIssueIsCreated(EXPECTED_AMOUNT_OF_ISSUES, issueDetails);
     openIssueDetails();
@@ -151,6 +154,7 @@ describe("Issue time tracking", () => {
     cy.wait(2000);
     openIssueDetails();
 
+    // Edit TiMe
     cy.get(WatchIcon).click();
     cy.get(timetrackingWindow).should("contain", "5h logged");
     cy.get(timetrackingWindow).within(() => {
@@ -160,6 +164,7 @@ describe("Issue time tracking", () => {
     cy.wait(2000);
     openIssueDetails();
 
+    // Delete time
     cy.get(WatchIcon).click();
     cy.get(timetrackingWindow).should("contain", "10h logged");
     cy.get(timetrackingWindow).within(() => {
@@ -168,6 +173,8 @@ describe("Issue time tracking", () => {
     closeTimeEstimation();
     cy.wait(2000);
     openIssueDetails();
+
+    // Check that it worked
     cy.get(WatchIcon).click();
     cy.get(timetrackingWindow).should("contain", "No time logged");
   });
