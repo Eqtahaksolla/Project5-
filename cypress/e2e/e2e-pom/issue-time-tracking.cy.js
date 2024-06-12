@@ -136,7 +136,7 @@ describe("Issue time tracking", () => {
     cy.get(inputNumber).should("have.value", "");
   });
 
-  it.only("should create issue, log time, update and delete it", () => {
+  it("should create issue, log time, update and delete it", () => {
     createNewIssue();
     IssueModal.ensureIssueIsCreated(EXPECTED_AMOUNT_OF_ISSUES, issueDetails);
     openIssueDetails();
