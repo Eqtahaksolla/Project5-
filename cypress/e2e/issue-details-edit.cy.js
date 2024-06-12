@@ -117,3 +117,27 @@ describe("Priority Dropdown", () => {
       });
   });
 });
+
+describe("Reporter Name Validation", () => {
+  it.only("should ensure the reporter's name contains only characters", () => {
+    // Open issue detail view
+    cy.get('[data-testid="board-list:backlog"]').within(() => {
+      cy.get('[data-testid="list-issue"]')
+        .first()
+        .scrollIntoView()
+        .click({ force: true });
+    });
+
+    // Access the reporter's name
+    cy.get('[data-testid="select:reporter"]').then(($reporter) => {
+      const reporterName = $reporter.text().trim();
+      cy.log(`Reporter name: ${reporterName}`);
+
+      // Regular expression to match only alphabetic characters and spaces
+      const regex = /^[A-Za-z\s]+$/;
+
+      // Assert that the reporter's name matches the regular expression
+      expect(reporterName).to.match(regex);
+    });
+  });
+});
