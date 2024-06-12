@@ -79,18 +79,15 @@ function setOriginalEstimate(value) {
     });
 }
 
-function setTimeValue(value) {
+function setTimeValues(timeSpent, timeRemaining) {
   const inputSelector = 'input[placeholder="Number"]';
-  cy.get(inputSelector)
-    .first()
-    .then((input) => {
-      if (value === "") {
-        cy.wrap(input).clear().should("have.attr", "placeholder", "Number");
-      } else {
-        cy.wrap(input).clear().type(value);
-        cy.contains("Done").click();
-      }
+  cy.get(timetrackingWindow).within(() => {
+    cy.get(inputSelector).then((inputs) => {
+      cy.wrap(inputs[0]).clear().type(timeSpent);
+      cy.wrap(inputs[1]).clear().type(timeRemaining);
     });
+    cy.contains("Done").click();
+  });
 }
 
 function closeTimeEstimation() {
@@ -139,7 +136,7 @@ describe("Issue time tracking", () => {
     cy.get(inputNumber).should("have.value", "");
   });
 
-  it("should create issue, log time, update and delete it", () => {
+  it.only("should create issue, log time, update and delete it", () => {
     createNewIssue();
     IssueModal.ensureIssueIsCreated(EXPECTED_AMOUNT_OF_ISSUES, issueDetails);
     openIssueDetails();
@@ -147,19 +144,15 @@ describe("Issue time tracking", () => {
     // Log time
     cy.get(WatchIcon).click();
     cy.get(timetrackingWindow).should("contain", "No time logged");
-    cy.get(timetrackingWindow).within(() => {
-      setTimeValue("5");
-    });
+    setTimeValues("5", "5");
     closeTimeEstimation();
     cy.wait(2000);
     openIssueDetails();
 
-    // Edit TiMe
+    // Edit Time
     cy.get(WatchIcon).click();
     cy.get(timetrackingWindow).should("contain", "5h logged");
-    cy.get(timetrackingWindow).within(() => {
-      setTimeValue("10");
-    });
+    setTimeValues("10", "15");
     closeTimeEstimation();
     cy.wait(2000);
     openIssueDetails();
@@ -167,9 +160,7 @@ describe("Issue time tracking", () => {
     // Delete time
     cy.get(WatchIcon).click();
     cy.get(timetrackingWindow).should("contain", "10h logged");
-    cy.get(timetrackingWindow).within(() => {
-      setTimeValue("0");
-    });
+    setTimeValues("0", "0");
     closeTimeEstimation();
     cy.wait(2000);
     openIssueDetails();
