@@ -1,4 +1,4 @@
-const expectedLength = 5; // Predefined expected number of elements in the priority dropdown
+const expectedLength = 5; // Expected number of elements in the priority dropdown
 let priorityValues = []; // Empty array variable
 
 beforeEach(() => {
@@ -7,8 +7,6 @@ beforeEach(() => {
     .should("eq", `${Cypress.env("baseUrl")}project`)
     .then((url) => {
       cy.visit(url + "/board");
-
-      // Increase timeout for contains command
       cy.contains("This is an issue of type: Task.", { timeout: 60000 })
         .should("be.visible")
         .click();
@@ -82,8 +80,7 @@ describe("Issue details editing", () => {
 });
 
 describe("Priority Dropdown", () => {
-  it.only("should verify the priority dropdown options", () => {
-    // Open issue detail view
+  it("should verify the priority dropdown options", () => {
     cy.get('[data-testid="board-list:backlog"]').within(() => {
       cy.get('[data-testid="list-issue"]')
         .first()
@@ -91,17 +88,15 @@ describe("Priority Dropdown", () => {
         .click({ force: true });
     });
 
-    // Push the initially selected priority value into the array
+    // Push the selected priority value into the array
     cy.get('[data-testid="select:priority"]').then(($selectedPriority) => {
       const selectedPriorityText = $selectedPriority.text().trim();
       priorityValues.push(selectedPriorityText);
       cy.log(`Initially selected priority: ${selectedPriorityText}`);
     });
 
-    // Open the priority dropdown
+    // Open and access all priority options
     cy.get('[data-testid="select:priority"]').click();
-
-    // Access all priority options
     cy.get('[data-testid^="select-option:"]')
       .each(($option, index, $options) => {
         const optionText = $option.text().trim();
@@ -112,15 +107,14 @@ describe("Priority Dropdown", () => {
         );
       })
       .then(() => {
-        // Assert that the array has the expected length
+        // Confirm
         expect(priorityValues.length).to.equal(expectedLength);
       });
   });
 });
 
 describe("Reporter Name Validation", () => {
-  it.only("should ensure the reporter's name contains only characters", () => {
-    // Open issue detail view
+  it("should ensure the reporter's name contains only characters", () => {
     cy.get('[data-testid="board-list:backlog"]').within(() => {
       cy.get('[data-testid="list-issue"]')
         .first()
@@ -133,11 +127,58 @@ describe("Reporter Name Validation", () => {
       const reporterName = $reporter.text().trim();
       cy.log(`Reporter name: ${reporterName}`);
 
-      // Regular expression to match only alphabetic characters and spaces
-      const regex = /^[A-Za-z\s]+$/;
+      // should match only alphabetic characters and spaces
+      const notThese = /^[A-Za-z\s]+$/;
 
-      // Assert that the reporter's name matches the regular expression
-      expect(reporterName).to.match(regex);
+      // Confirm
+      expect(reporterName).to.match(notThese);
+    });
+  });
+});
+
+describe("Issue Creation and Title Trimming", () => {
+  const titleWithSpaces = "   Hello    world!   ";
+  const trimmedTitle = "Hello world!";
+
+  it.only("should remove unnecessary spaces from the issue title on the board view", () => {
+    // Close the currently opened issue details modal if it's open
+    cy.get("body").then(($body) => {
+      if ($body.find('[data-testid="modal:issue-details"]').length) {
+        cy.get('[data-testid="modal:issue-details"] [data-testid="icon:close"]')
+          .first()
+          .click();
+      }
+    });
+
+    // Create a new issue with a title containing extra spaces
+    cy.get('[data-testid="icon:plus"]').click();
+    cy.get('[data-testid="modal:issue-create"]').within(() => {
+      cy.get('input[name="title"]').type(titleWithSpaces);
+      cy.get(".ql-editor").type("This is a description.");
+      cy.get('[data-testid="select:priority"]').click();
+      cy.get('[data-testid="select-option:Low"]').click();
+      cy.get('[data-testid="select:reporterId"]').click();
+      cy.get('[data-testid="select-option:Pickle Rick"]').click();
+      cy.get('button[type="submit"]').click();
+      cy.wait(5000);
+    });
+
+    // Confirm the issue title is trimmed on the board view
+    cy.get('[data-testid="modal:issue-create"]').should("not.exist");
+    cy.contains("Issue has been successfully created.").should("be.visible");
+    cy.reload();
+    cy.contains("Issue has been successfully created.").should("not.exist");
+
+    cy.get('[data-testid="board-list:backlog"]').within(() => {
+      cy.wait(10000); // Adding wait to ensure the issue is loaded
+      cy.get('[data-testid="list-issue"]')
+        .first()
+        .find("p")
+        .should("be.visible")
+        .and(($issueTitle) => {
+          const issueTitleText = $issueTitle.text().replace(/\s+/g, " ").trim();
+          expect(issueTitleText).to.equal(trimmedTitle);
+        });
     });
   });
 });

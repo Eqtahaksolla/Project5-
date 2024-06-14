@@ -17,7 +17,7 @@ describe("Issue create", () => {
       });
   });
 
-  it("Test Case 1: Custom Issue Creation:", () => {
+  it.only("Test Case 1: Custom Issue Creation:", () => {
     const { randomTitle, randomDescription } = generateRandomIssueData();
 
     cy.get('[data-testid="modal:issue-create"]', { timeout: 60000 }).should(
@@ -73,10 +73,6 @@ describe("Issue create", () => {
 
   it("Test Case 2: Random Data Plugin Issue Creation:", () => {
     const { randomTitle, randomDescription } = generateRandomIssueData();
-
-    cy.get('[data-testid="modal:issue-create"]', { timeout: 60000 }).should(
-      "be.visible"
-    );
 
     cy.get('[data-testid="modal:issue-create"]', { timeout: 60000 }).should(
       "be.visible"
